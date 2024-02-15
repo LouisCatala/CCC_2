@@ -94,8 +94,25 @@ def main(row_number):
 
     # Gather relevant data  for fill in section (Next Section is Fill In)
     gathered_data = search_and_gather(source_data,[adjusted_row_number]) # actual get line 2, so it is 0. which is acutal line -2
-    cell_dict_Q1 = {'H3': 'Date', 'H4': 'INV. #', 'C6': 'Customer',
-                'B13': 'salesman', 'C13': '', 'D13': '', 'F6': ''}
+    cell_dict_Q1 = {'H3': '', 'H4': '', 'C6': '', 'B13': '', 'C13': '', 'D13': '', 'F6': ''}
+    #For column QTY, GRADE, YEAR
+    B2i_list = ["B" + str(16 + 2 * i) for i in range(10)]
+    print("QTY",B2i_list)
+    D2i_list = ["D" + str(16 + 2 * i) for i in range(10)]
+    print("grade/coin name", D2i_list)
+    year2i_list = ["C" + str(16 + 2 * i) for i in range(10)]
+    print("year_list", year2i_list)
+    # Convert lists into a dictionary for update_workbook method
+    empty_list = [""] * 10
+    dictionary_qty = dict(zip(B2i_list, empty_list))
+    print(dictionary_qty)
+    dictionary_grade = dict(zip(D2i_list, empty_list))
+    print(dictionary_grade)
+    dictionary_year = dict(zip(year2i_list, empty_list))
+    print(dictionary_year)
+    all_updates = combine_updates(cell_dict_Q1, dictionary_qty, dictionary_grade, dictionary_year)
+    
+    update_workbook(all_updates, EXCEL_SHEET_PATH)
     #----------------------------H3:Date----------------------------------------------
     formatted_date = "Unknown Date"
     date_object = gathered_data['Unnamed: 0'][0]
@@ -121,26 +138,27 @@ def main(row_number):
     #--------------------------------Q1 single cell updates ended-------------------------#
     Qty_list = []
     coin_list = gathered_data['Coin'][0]
-    print(coin_list)
-
-    string_list = process_string(coin_list)
-
-    string_list = create_qty_list(string_list, Qty_list)
-
-    year = date_object.strftime("%Y")  
+    string_list1 = process_string(coin_list)
+    string_list = create_qty_list(string_list1, Qty_list)
+    year = date_object.strftime("%Y") 
     year_list = []
     for i in range(len(Qty_list)):
         year_list.append(year)
-
+    #-----------Above clear--------------#
     #For column QTY, GRADE, YEAR
     B2i_list = ["B" + str(16 + 2 * i) for i in range(len(Qty_list))]
+    print("QTY",B2i_list)
     D2i_list = ["D" + str(16 + 2 * i) for i in range(len(string_list))]
+    print("grade/coin name", D2i_list)
     year2i_list = ["C" + str(16 + 2 * i) for i in range(len(Qty_list))]
-
+    print("year_list", year2i_list)
     # Convert lists into a dictionary for update_workbook method
     dictionary_qty = dict(zip(B2i_list, Qty_list))
+    print(dictionary_qty)
     dictionary_grade = dict(zip(D2i_list, string_list))
+    print(dictionary_grade)
     dictionary_year = dict(zip(year2i_list, year_list))
+    print(dictionary_year)
 
     #----------------------Q1 muti cells updates end------------------------------------------#
 
@@ -155,7 +173,8 @@ def main(row_number):
     shutil.copy(EXCEL_SHEET_PATH, new_file_path)
     
     all_updates = combine_updates(cell_dict_Q1, dictionary_qty, dictionary_grade, dictionary_year)
-    update_workbook(all_updates, EXCEL_SHEET_PATH)
+    
+    update_workbook(all_updates, new_file_path)
     print("Saving file to:", new_file_path)
 
 
