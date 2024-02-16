@@ -84,11 +84,11 @@ def combine_updates(*args):
         combined_dict.update(dictionary)
     return combined_dict
 
-def main(row_number):
+def main(row_number, source_file_path):
     adjusted_row_number = row_number - 2
     #CCC Phone Sales 2023.xlsx
     # source_file_path = r'C:\Users\13473\Desktop\CCC\CCC Phone Sales 2023.xlsx'  # Path to the source Excel file
-    source_file_path = script_location / 'CCC Phone Sales 2023.xlsx'
+    # source_file_path = script_location / 'CCC Phone Sales 2023.xlsx' #dam
     #---------------------------------------Q1 Page Update for CCC Phone Sales To Create new Invoice ----------------------------------
     source_data = read_excel_sge(source_file_path, 'Q1') #when put row number for Q1 sheet, do the actual row number -2, because starts at two.
 
@@ -97,19 +97,13 @@ def main(row_number):
     cell_dict_Q1 = {'H3': '', 'H4': '', 'C6': '', 'B13': '', 'C13': '', 'D13': '', 'F6': ''}
     #For column QTY, GRADE, YEAR
     B2i_list = ["B" + str(16 + 2 * i) for i in range(10)]
-    print("QTY",B2i_list)
     D2i_list = ["D" + str(16 + 2 * i) for i in range(10)]
-    print("grade/coin name", D2i_list)
     year2i_list = ["C" + str(16 + 2 * i) for i in range(10)]
-    print("year_list", year2i_list)
     # Convert lists into a dictionary for update_workbook method
     empty_list = [""] * 10
     dictionary_qty = dict(zip(B2i_list, empty_list))
-    print(dictionary_qty)
     dictionary_grade = dict(zip(D2i_list, empty_list))
-    print(dictionary_grade)
     dictionary_year = dict(zip(year2i_list, empty_list))
-    print(dictionary_year)
     all_updates = combine_updates(cell_dict_Q1, dictionary_qty, dictionary_grade, dictionary_year)
     
     update_workbook(all_updates, EXCEL_SHEET_PATH)
@@ -147,18 +141,12 @@ def main(row_number):
     #-----------Above clear--------------#
     #For column QTY, GRADE, YEAR
     B2i_list = ["B" + str(16 + 2 * i) for i in range(len(Qty_list))]
-    print("QTY",B2i_list)
     D2i_list = ["D" + str(16 + 2 * i) for i in range(len(string_list))]
-    print("grade/coin name", D2i_list)
     year2i_list = ["C" + str(16 + 2 * i) for i in range(len(Qty_list))]
-    print("year_list", year2i_list)
     # Convert lists into a dictionary for update_workbook method
     dictionary_qty = dict(zip(B2i_list, Qty_list))
-    print(dictionary_qty)
     dictionary_grade = dict(zip(D2i_list, string_list))
-    print(dictionary_grade)
     dictionary_year = dict(zip(year2i_list, year_list))
-    print(dictionary_year)
 
     #----------------------Q1 muti cells updates end------------------------------------------#
 
@@ -176,11 +164,7 @@ def main(row_number):
     
     update_workbook(all_updates, new_file_path)
     print("Saving file to:", new_file_path)
-
-
 #Make user able to swap the path for excel_sheet_path
-    
-
     
 if __name__ == "__main__":
     if len(sys.argv) > 1:
@@ -195,3 +179,4 @@ if __name__ == "__main__":
                 print(f"Invalid row number: {row_str}")
     else:
         print("No row number provided")
+

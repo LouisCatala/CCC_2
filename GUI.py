@@ -1,10 +1,29 @@
+#pyinstaller --onefile --windowed --icon=CCC.ico --add-data="*.xlsx;." GUI.py BORKEN
 import tkinter as tk
+from tkinter import filedialog, messagebox
+import os
 import re
+import json
 from pathlib import Path
 from create_invoice import main
 
 # Get the current location of the Python script
 script_location = Path(__file__).resolve().parent
+config_directory = Path.home() / '.CreateInvoiceApp'
+config_directory.mkdir(exist_ok=True)  # Create the directory if it doesn't exist
+config_path = config_directory / 'config.json'
+
+
+def save_config(file_path):
+    with open(config_path, 'w') as config_file:
+        json.dump({'excel_file_path': file_path}, config_file)
+
+def load_config():
+    if config_path.exists():
+        with open(config_path, 'r') as config_file:
+            config = json.load(config_file)
+            return config.get('excel_file_path')
+    return None
 
 def parse_row_numbers(input_str):
     """Parse the input string into a list of row numbers, including expanding ranges."""
@@ -17,13 +36,28 @@ def parse_row_numbers(input_str):
             row_numbers.append(int(part))
     return row_numbers
 
+def prompt_for_file():
+    """Prompt the user for the file when the application starts."""
+    messagebox.showinfo("Select File", "Please select the CCC phone sales file you have.")
+    file_path = load_config()
+    if not file_path or not Path(file_path).exists():
+        file_path = filedialog.askopenfilename(
+            title="Select the CCC Phone Sales Excel file",
+            filetypes=(("Excel files", "*.xlsx"), ("All files", "*.*"))
+        )
+        if not file_path:
+            messagebox.showerror("No file selected", "You must select a file to proceed.")
+            root.quit()  # Close the application if no file is selected
+            return
+        save_config(file_path)
+    return file_path
+
 def run_create_invoice():
     input_str = entry.get()
     row_numbers = parse_row_numbers(input_str)
-
     # Let user choose the directory to save the file
     for i, row_number in enumerate(row_numbers, start=1):
-        main(row_number)  # Pass each row number and save directory to main
+        main(row_number, file_path)  # Pass each row number and save directory to main
         result_label.config(text=f"Processing row: {row_number} ({i}/{len(row_numbers)})")
         root.update()  # This updates the GUI.
 
@@ -36,7 +70,7 @@ def on_validate(P):
 # Create the main window
 root = tk.Tk()
 root.title("Fill Excel Sheet")
-
+file_path = prompt_for_file()
 # def check_number():
 #     # Get the text from the entry widget
 #     user_input = entry.get()
