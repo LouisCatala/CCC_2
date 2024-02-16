@@ -75,4 +75,5 @@ submit_button.pack(side=tk.RIGHT, padx=5, pady=5)
 instruction_label = tk.Label(app, text="Press enter to see something fancy")
 instruction_label.pack(side=tk.BOTTOM, pady=5)
 
-app.mainloop()
+if __name__ == "__main__":
+    app.mainloop()

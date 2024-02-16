@@ -1,5 +1,5 @@
 import tkinter as tk
-from Section1 import app, entries  # Assuming your main file is named section1.py
+from Section1 import app, entries  # Make sure this import matches your file and variable names
 
 # Define a dictionary with sample data for each field
 sample_data = {
@@ -25,16 +25,17 @@ sample_data = {
 }
 
 def fill_fields_with_sample_data():
-    # Iterate over the entries and set the sample data for each field
     for field, entry in entries.items():
         if isinstance(entry, list):
             for i, e in enumerate(entry):
+                e.delete(0, tk.END)  # Clear the entry first
                 e.insert(0, sample_data[field][i])
         else:
+            entry.delete(0, tk.END)  # Clear the entry first
             entry.insert(0, sample_data[field])
 
-# Call the function to fill the fields with sample data
-fill_fields_with_sample_data()
-
-# Start the tkinter loop
+# Use the `after` method to schedule the data fill
+app.after(100, fill_fields_with_sample_data)
+# print(entries)  
+# Start the Tkinter main loop
 app.mainloop()
