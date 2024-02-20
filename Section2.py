@@ -36,23 +36,51 @@ def create_excel_invoice(invoice_data):
         'Unit Price': ['F17', 'F19', 'F21', 'F23', 'F25']
     }
 
+    # Before processing line items, find the minimum length of the provided lists to avoid "index out of range" errors
+    min_line_items_length = min(len(invoice_data[field]) for field in line_item_fields)
+
     for field in line_item_fields:
-        for i, cell in enumerate(line_item_cells[field]):
-            ws[cell] = invoice_data[field][i]
+        for i in range(min_line_items_length):
+            value = invoice_data[field][i]
+            cell = line_item_cells[field][i]
+            if value:  # Check if there's actually a value to avoid writing empty strings for missing data
+                ws[cell] = value
+
 
     # Calculate Line Totals and Subtotal
+    # Calculate Line Totals and Subtotal
     subtotal = 0
-    for i, qty in enumerate(invoice_data['QTY']):
-        unit_price = invoice_data['Unit Price'][i]
+    for i, qty_str in enumerate(invoice_data['QTY']):
+        # Check if qty_str is not empty, else default to 0
+        qty = int(qty_str) if qty_str else 0
+        
+        unit_price_str = invoice_data['Unit Price'][i]
+        # Check if unit_price_str is not empty, else default to 0.0
+        unit_price = float(unit_price_str) if unit_price_str else 0.0
+        
         line_total = qty * unit_price
-        ws[line_item_cells['QTY'][i].replace('B', 'H')] = line_total  # Replace 'B' with 'H' in QTY cells for Line Total cells
+        if line_total != 0:  # Only write line_total if it's not 0
+            ws[line_item_cells['QTY'][i].replace('B', 'H')] = line_total
         subtotal += line_total
 
-    # Write Subtotal, Shipping, and Balance Due
-    ws['H38'] = subtotal
-    shipping_cost = invoice_data.get('Shipping', 0)  # Use 0 as default if Shipping is not provided
-    ws['H39'] = shipping_cost
-    ws['H40'] = subtotal + shipping_cost
+    # Write Subtotal, Shipping, and Balance Due only if they are not 0
+    if subtotal != 0:
+        ws['H38'] = subtotal
+
+    try:
+        shipping_str = invoice_data.get('Shipping', '0')  # Default to '0' if not provided
+        shipping_cost = float(shipping_str) if shipping_str else 0.0
+    except ValueError:
+        shipping_cost = 0.0  # Default to 0.0 if conversion fails
+
+    if shipping_cost != 0.0:
+        ws['H39'] = shipping_cost
+
+    balance_due = subtotal + shipping_cost
+    if balance_due != 0.0:
+        ws['H40'] = balance_due
+
+
     
     salesman_name = invoice_data['SOLD TO']
     first_initial = salesman_name.split()[0][0]

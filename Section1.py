@@ -1,11 +1,15 @@
 import tkinter as tk
+from Section2 import create_excel_invoice 
 
 def focus_next_widget(event):
     event.widget.tk_focusNext().focus()
     return("break")
-
+    
 app = tk.Tk()
 app.title("Invoice Input Form")
+
+instruction_label = tk.Label(app, text="Press Tab/ enter go Next box. After click on text box, \n if needed, Ctrl+A to select infos. Ctrl+C to copy, Ctrl+V to paste infos")
+instruction_label.pack(side=tk.TOP, pady=5)
 
 # Define the regular fields
 regular_fields = [
@@ -62,18 +66,24 @@ for field in under_multi_entry_fields:
     entries[field] = entry
     
 def on_submit():
+    invoice_data = {}
     for field, entry in entries.items():
-        if isinstance(entry, list):
-            values = [e.get() for e in entry]
-            print(f"{field}: {values}")
+        if isinstance(entry, list):  # For fields with multiple entries
+            invoice_data[field] = [e.get() for e in entry]
         else:
-            print(f"{field}: {entry.get()}")  # Here you can process or print the entry data
+            invoice_data[field] = entry.get()
+    
+    # Assuming create_excel_invoice is properly imported or defined in this script
+    try:
+        new_invoice_path = create_excel_invoice(invoice_data)
+        print(f"Invoice saved to: {new_invoice_path}")
+        # Optionally, you can show a success message to the user here
+    except Exception as e:
+        print(f"Error generating invoice: {e}")
+        # Optionally, handle or show the error to the user here
 
 submit_button = tk.Button(app, text='Submit', command=on_submit)
 submit_button.pack(side=tk.RIGHT, padx=5, pady=5)
-
-instruction_label = tk.Label(app, text="Press enter to see something fancy")
-instruction_label.pack(side=tk.BOTTOM, pady=5)
 
 if __name__ == "__main__":
     app.mainloop()
