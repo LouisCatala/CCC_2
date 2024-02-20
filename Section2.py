@@ -1,8 +1,14 @@
 import os
 from openpyxl import load_workbook
 
+# Get the directory of the current script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Construct the path to the Excel template using a relative path
+template_path = os.path.join(script_dir, 'Invoice temple_CCC.xlsx')
+
 def create_excel_invoice(invoice_data):
-    template_path = r"C:\Users\13473\Desktop\CCC\Inovices\Invoice temple_CCC.xlsx"  # Update this path to your template's location
+    # template_path = r"C:\Users\13473\Desktop\CCC\Inovices\Invoice temple_CCC.xlsx"  # Update this path to your template's location
     invoices_folder = os.path.expanduser("~/Desktop/invoices")
     if not os.path.exists(invoices_folder):
         os.makedirs(invoices_folder)
