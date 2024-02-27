@@ -1,5 +1,6 @@
 # Make a better code, consider goal, the process,
 # after (the possible changes required), Connect with acutal situation.
+# pyinstaller --onefile --windowed --add-data "Invoice temple_CCC.xlsx;." -n Create_Invoice Section1.py
 import os
 from openpyxl import load_workbook
 
