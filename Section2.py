@@ -78,16 +78,18 @@ def create_excel_invoice(invoice_data):
         shipping_cost = float(shipping_str) if shipping_str else 0.0
     except ValueError:
         shipping_cost = 0.0  # Default to 0.0 if conversion fails
-
+    try:
+        amount_down_str = invoice_data.get('Amount down', '0')  # Default to '0' if not provided
+        amount_down = float(amount_down_str) if amount_down_str else 0.0
+    except ValueError:
+        amount_down = 0.0  # Default to 0.0 if conversion fails
     if shipping_cost != 0.0:
         ws['H39'] = shipping_cost
 
-    balance_due = subtotal + shipping_cost
+    balance_due = subtotal - amount_down
     if balance_due != 0.0:
         ws['H40'] = balance_due
 
-
-    
     salesman_name = invoice_data['SOLD TO']
     first_initial = salesman_name.split()[0][0]
     last_name = salesman_name.split()[-1]
