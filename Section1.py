@@ -1,5 +1,6 @@
 import tkinter as tk
 from Section2 import create_excel_invoice 
+global_invoice_data = {}
 
 def focus_next_widget(event):
     event.widget.tk_focusNext().focus()
@@ -66,12 +67,14 @@ for field in under_multi_entry_fields:
     entries[field] = entry
     
 def on_submit():
+    global global_invoice_data
     invoice_data = {}
     for field, entry in entries.items():
         if isinstance(entry, list):  # For fields with multiple entries
             invoice_data[field] = [e.get() for e in entry]
         else:
             invoice_data[field] = entry.get()
+    global_invoice_data = invoice_data
     
     # Assuming create_excel_invoice is properly imported or defined in this script
     try:
@@ -81,9 +84,20 @@ def on_submit():
     except Exception as e:
         print(f"Error generating invoice: {e}")
         # Optionally, handle or show the error to the user here
+def copy_to_clipboard():
+    formatted_data = create_excel_invoice(global_invoice_data).format_data_for_excel()
+    app.clipboard_clear()  # Clear the clipboard
+    app.clipboard_append(formatted_data)  # Append the formatted data to the clipboard
+    print("Data copied to clipboard.")
+#Copy Button for copy and paste
 
+copy_button = tk.Button(app, text='Copy', command=copy_to_clipboard)
+copy_button.pack(side=tk.RIGHT, padx=0, pady=5)
+
+#submit button
 submit_button = tk.Button(app, text='Submit', command=on_submit)
 submit_button.pack(side=tk.RIGHT, padx=5, pady=5)
+
 
 if __name__ == "__main__":
     app.mainloop()
