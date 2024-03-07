@@ -1,5 +1,7 @@
 import tkinter as tk
 from Section2 import create_excel_invoice 
+from Section2 import formatted_data_2
+
 global_invoice_data = {}
 
 def focus_next_widget(event):
@@ -78,21 +80,20 @@ def on_submit():
     
     # Assuming create_excel_invoice is properly imported or defined in this script
     try:
-        new_invoice_path = create_excel_invoice(invoice_data)
+        new_invoice_path, formatted_data_2 = create_excel_invoice(invoice_data)
         print(f"Invoice saved to: {new_invoice_path}")
         # Optionally, you can show a success message to the user here
     except Exception as e:
         print(f"Error generating invoice: {e}")
         # Optionally, handle or show the error to the user here
-def copy_to_clipboard():
-    formatted_data = create_excel_invoice(global_invoice_data).format_data_for_excel()
-    app.clipboard_clear()  # Clear the clipboard
-    app.clipboard_append(formatted_data)  # Append the formatted data to the clipboard
-    print("Data copied to clipboard.")
+    def copy_to_clipboard():
+        app.clipboard_clear()  # Clear the clipboard
+        app.clipboard_append(formatted_data_2)  # Append the formatted data to the clipboard
+        print(formatted_data_2)
+        print("Data copied to clipboard.")
 #Copy Button for copy and paste
-
-copy_button = tk.Button(app, text='Copy', command=copy_to_clipboard)
-copy_button.pack(side=tk.RIGHT, padx=0, pady=5)
+    copy_button = tk.Button(app, text='Copy', command=copy_to_clipboard)
+    copy_button.pack(side=tk.RIGHT, padx=0, pady=5)
 
 #submit button
 submit_button = tk.Button(app, text='Submit', command=on_submit)

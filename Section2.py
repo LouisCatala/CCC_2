@@ -6,9 +6,10 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Construct the path to the Excel template using a relative path
 template_path = os.path.join(script_dir, 'Invoice temple_CCC.xlsx')
+formatted_data_2 = ''
 
 def create_excel_invoice(invoice_data):
-        
+    global formatted_data_2        
     # template_path = r"C:\Users\13473\Desktop\CCC\Inovices\Invoice temple_CCC.xlsx"  # Update this path to your template's location
     invoices_folder = os.path.expanduser("~/Desktop/invoices")
     if not os.path.exists(invoices_folder):
@@ -101,15 +102,12 @@ def create_excel_invoice(invoice_data):
     
     # Close the workbook
     wb.close()
-    details = [f"({qty}) {grade} {desc}" for qty, grade, desc in zip(invoice_data['QTY'].tolist(), invoice_data['GRADE'].tolist(), invoice_data['Description'].tolist())]
-    print(details)
+    details = [f"({qty}) {grade} {desc}" for qty, grade, desc in zip(invoice_data['QTY'], invoice_data['GRADE'], invoice_data['Description'])]
     combined_string = ' (), '.join(details)
-    print(combined_string)
-    def format_data_for_excel():
-        formatted_data = f"{invoice_data['DATE']}\t{invoice_data['INV#']}\t{shortened_name}\t{invoice_data['SALESMAN']}\t\"{combined_string}\""
-        return formatted_data
+    formatted_data_2 = f"{invoice_data['DATE']}\t{invoice_data['INV#']}\t{shortened_name}\t{invoice_data['SALESMAN']}\t\"{combined_string}\""
+    print(formatted_data_2)
 
-    return new_invoice_path  # Returns the path of the saved invoice
+    return new_invoice_path, formatted_data_2  # Returns the path and data for global use
 
 
 
