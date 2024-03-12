@@ -1,6 +1,6 @@
 #Solve the issue first. Then, clean it up.
 import tkinter as tk
-from more_than_six_coins import app, entries  # Make sure this import matches your file and variable names
+from complete_code import app, entries  # Make sure this import matches your file and variable names
 
 # Define a dictionary with sample data for each field
 sample_data = {
