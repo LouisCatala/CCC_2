@@ -1,10 +1,13 @@
 #Solve the issue first. Then, clean it up.
 import tkinter as tk
 from complete_code import app, entries  # Make sure this import matches your file and variable names
+from random import randint
+
+value = randint(0, 10)
 
 # Define a dictionary with sample data for each field
 sample_data = {
-    'INV#': '4444',
+    'INV#': f'{value}',
     'SOLD TO': 'Company LOL',
     'DATE': '02/16/2024',
     'Address': '1234 Main St',
@@ -22,7 +25,6 @@ sample_data = {
     'Description': ['Item A', 'Item B', 'Item C', 'Item D', 'Item E','Gwen', 'Irelia', 'Samira', 'Sona', 'Lux'],
     'Unit Price': ['100', '200', '300', '400', '500','20', '400', '30', '500', '5'],
     'Shipping': '',
-    'Balance Due': ''
 }
 
 def fill_fields_with_sample_data():

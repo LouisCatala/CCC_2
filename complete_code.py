@@ -3,6 +3,8 @@
 # pyinstaller --onefile --windowed --add-data "Invoice temple_CCC.xlsx;." -n Create_Invoice Section1.py
 import os
 from openpyxl import load_workbook
+import subprocess
+import sys
 
 
 # Get the directory of the current script
@@ -11,6 +13,15 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 # Construct the path to the Excel template using a relative path
 template_path = os.path.join(script_dir, 'Invoice temple_CCC.xlsx')
 
+#to Open Excel after run
+def open_file(file_path):
+    if sys.platform == "win32":
+        os.startfile(file_path)
+    elif sys.platform == "darwin":
+        subprocess.Popen(["open", file_path])
+    else:  # 'linux' or 'linux2' for Linux
+        subprocess.Popen(["xdg-open", file_path])
+        
 def create_excel_invoice(invoice_data):
     global formatted_data_2        
     # template_path = r"C:\Users\13473\Desktop\CCC\Inovices\Invoice temple_CCC.xlsx"  # Update this path to your template's location
@@ -40,12 +51,13 @@ def create_excel_invoice(invoice_data):
     # Fill in the line items
     line_item_fields = ['QTY', 'DATE(Year)', 'GRADE', 'Description', 'Unit Price']
     line_item_cells = {
-        'QTY': ['B17', 'B19', 'B21', 'B23', 'B25'],
-        'DATE(Year)': ['C17', 'C19', 'C21', 'C23', 'C25'],
-        'GRADE': ['D17', 'D19', 'D21', 'D23', 'D25'],
-        'Description': ['E17', 'E19', 'E21', 'E23', 'E25'],
-        'Unit Price': ['F17', 'F19', 'F21', 'F23', 'F25']
+        'QTY': ['B17', 'B19', 'B21', 'B23', 'B25', 'B27', 'B29', 'B31', 'B33', 'B35'],
+        'DATE(Year)': ['C17', 'C19', 'C21', 'C23', 'C25', 'C27', 'C29', 'C31', 'C33', 'C35'],
+        'GRADE': ['D17', 'D19', 'D21', 'D23', 'D25', 'D27', 'D29', 'D31', 'D33', 'D35'],
+        'Description': ['E17', 'E19', 'E21', 'E23', 'E25', 'E27', 'E29', 'E31', 'E33', 'E35'],
+        'Unit Price': ['F17', 'F19', 'F21', 'F23', 'F25', 'F27', 'F29', 'F31', 'F33', 'F35']
     }
+
 
     # Before processing line items, find the minimum length of the provided lists to avoid "index out of range" errors
     min_line_items_length = min(len(invoice_data[field]) for field in line_item_fields)
@@ -105,6 +117,7 @@ def create_excel_invoice(invoice_data):
     
     # Close the workbook
     wb.close()
+    open_file(new_invoice_path) #Open the Excel
     details = [f"({qty}) {grade} {desc}" for qty, grade, desc in zip(invoice_data['QTY'], invoice_data['GRADE'], invoice_data['Description'])]
     combined_string = ' (), '.join(details)
     formatted_data_2 = f"{invoice_data['DATE']}\t{invoice_data['INV#']}\t{shortened_name}\t{invoice_data['SALESMAN']}\t\"{combined_string}\"" 
@@ -122,8 +135,11 @@ def focus_next_widget(event):
 app = tk.Tk()
 app.title("Invoice Input Form")
 
-instruction_label = tk.Label(app, text="Press Tab/ enter go Next box. After click on text box, \n if needed, Ctrl+A to select infos. Ctrl+C to copy, Ctrl+V to paste infos")
-instruction_label.pack(side=tk.TOP, pady=5)
+main_frame = tk.Frame(app)
+main_frame.pack(pady=10, padx=10, fill="both", expand=True)
+
+instruction_label = tk.Label(main_frame, text="Press Tab/ enter go Next box. After click on text box, \n if needed, Ctrl+A to select infos. Ctrl+C to copy, Ctrl+V to paste infos")
+instruction_label.grid(row=0, column=0, columnspan=2, pady=5)
 
 # Define the regular fields
 regular_fields = [
@@ -132,54 +148,52 @@ regular_fields = [
     'Payment Method', 'Due Date'
 ]
 
-# Define the fields that need multiple entries on the same line
-multi_entry_fields = [
-    ('QTY', 5),
-    ('DATE(Year)', 5),
-    ('GRADE', 5),
-    ('Description', 5),
-    ('Unit Price', 5)
-]
-under_multi_entry_fields = {
-    'Shipping', 'Balance Due'
-}
 entries = {}
-for field in regular_fields:
-    row = tk.Frame(app)
-    label = tk.Label(row, width=22, text=field+": ", anchor='w')
-    entry = tk.Entry(row)
+# Create a frame for the regular fields
+left_frame = tk.Frame(main_frame)
+left_frame.grid(row=1, column=0, sticky="ns")
+
+# Add fields to the left_frame
+for idx, field in enumerate(regular_fields):
+    label = tk.Label(left_frame, width=15, text=field+": ", anchor='w')
+    entry = tk.Entry(left_frame)
     entry.bind("<Return>", focus_next_widget)
-    row.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
-    label.pack(side=tk.LEFT)
-    entry.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
+    label.grid(row=idx+1, column=0, sticky="e")
+    entry.grid(row=idx+1, column=1, sticky="ew")
     entries[field] = entry
 
-# Handling multiple entries
-for field, num in multi_entry_fields:
-    row = tk.Frame(app)
-    tk.Label(row, width=22, text=field+": ", anchor='w').pack(side=tk.LEFT)
-    row.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
+# Handling multiple entries, create a frame for the multi-entry fields
+right_frame = tk.Frame(main_frame)
+right_frame.grid(row=1, column=1, sticky="ns")
 
-    # Create the specified number of entries for each field
+multi_entry_fields = [
+    ('QTY', 10),
+    ('DATE(Year)', 10),
+    ('GRADE', 10),
+    ('Description', 10),
+    ('Unit Price', 10)
+]
+
+for idx, (field, num) in enumerate(multi_entry_fields):
+    label = tk.Label(right_frame, text=field+":", anchor='e')
+    label.grid(row=idx, column=0, sticky='e')
     entries[field] = []
     for i in range(num):
-        entry = tk.Entry(row)
+        entry = tk.Entry(right_frame)
         entry.bind("<Return>", focus_next_widget)
-        entry.pack(side=tk.LEFT, expand=tk.YES, fill=tk.X, padx=2)
+        # Apply internal padding to make the entry widget appear taller
+        entry.grid(row=idx, column=i+1, padx=2, sticky="ew", ipady=15)  # Adjust ipady as needed
         entries[field].append(entry)
-        
-#Handling under_multi_entry_field
-for field in under_multi_entry_fields:
-    if field != "Balance Due":
-        row = tk.Frame(app)
-        label = tk.Label(row, width=22, text=field+": ", anchor='w')
-        entry = tk.Entry(row)
-        entry.bind("<Return>", focus_next_widget)
-        row.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
-        label.pack(side=tk.LEFT)
-        entry.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
-        entries[field] = entry
-    
+
+
+# Ensure the grid cells in the left frame expand as needed
+left_frame.grid_columnconfigure(1, weight=1)
+
+# Ensure the grid cells in the right frame expand as needed
+for i in range(1, 11):  # Now configuring for 10 entries
+    right_frame.grid_columnconfigure(i, weight=1)
+
+# Function for the Submit button
 def on_submit():
     global global_invoice_data
     invoice_data = {}
@@ -195,24 +209,23 @@ def on_submit():
         new_invoice_path, formatted_data_2 = create_excel_invoice(invoice_data)
         print(f"Invoice saved to: {new_invoice_path}")
         messagebox.showinfo("Success", f"Invoice saved to: {new_invoice_path}")
-        # Optionally, you can show a success message to the user here
     except Exception as e:
-        messagebox.showerror("Error", f"Error generating invoice: {e}")  # Show an error message box
-        print(f"Error generating invoice: {e}")  # Also print the error to the console for debugging
-            
-    def copy_to_clipboard():
-        app.clipboard_clear()  # Clear the clipboard
-        app.clipboard_append(formatted_data_2)  # Append the formatted data to the clipboard
-        print("Data copied to clipboard.")
-#Copy Button for copy and paste
-    copy_button = tk.Button(app, text='Copy', command=copy_to_clipboard)
-    copy_button.pack(side=tk.RIGHT, padx=0, pady=5)
+        messagebox.showerror("Error", f"Error generating invoice: {e}")
+        print(f"Error generating invoice: {e}")
+        
+# Copy Button for copy and paste
+def copy_to_clipboard():
+    app.clipboard_clear()  # Clear the clipboard
+    app.clipboard_append(formatted_data_2)  # Append the formatted data to the clipboard
+    print("Data copied to clipboard.")
 
-#submit button
+copy_button = tk.Button(app, text='Copy', command=copy_to_clipboard)
+copy_button.pack(side=tk.RIGHT, padx=0, pady=5)
+
+# Submit button
 submit_button = tk.Button(app, text='Submit', command=on_submit)
 submit_button.pack(side=tk.RIGHT, padx=5, pady=5)
 
 
 if __name__ == "__main__":
     app.mainloop()
-
