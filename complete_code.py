@@ -4,6 +4,7 @@
 import os
 from openpyxl import load_workbook
 
+
 # Get the directory of the current script
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -109,14 +110,10 @@ def create_excel_invoice(invoice_data):
     formatted_data_2 = f"{invoice_data['DATE']}\t{invoice_data['INV#']}\t{shortened_name}\t{invoice_data['SALESMAN']}\t\"{combined_string}\"" 
     return new_invoice_path, formatted_data_2 
 
-# Example usage (you need to replace 'path_to_template/template.xlsx' with your actual template's path and provide the actual data in 'invoice_data'):
-# invoice_data = {
-#     'INV#': '12345',
-#     ... # other fields and values as required
-# }
-# new_invoice_path = create_excel_invoice(invoice_data)
-# print("Invoice saved to:", new_invoice_path)
+
 import tkinter as tk
+from tkinter import messagebox  
+
 
 def focus_next_widget(event):
     event.widget.tk_focusNext().focus()
@@ -173,14 +170,15 @@ for field, num in multi_entry_fields:
         
 #Handling under_multi_entry_field
 for field in under_multi_entry_fields:
-    row = tk.Frame(app)
-    label = tk.Label(row, width=22, text=field+": ", anchor='w')
-    entry = tk.Entry(row)
-    entry.bind("<Return>", focus_next_widget)
-    row.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
-    label.pack(side=tk.LEFT)
-    entry.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
-    entries[field] = entry
+    if field != "Balance Due":
+        row = tk.Frame(app)
+        label = tk.Label(row, width=22, text=field+": ", anchor='w')
+        entry = tk.Entry(row)
+        entry.bind("<Return>", focus_next_widget)
+        row.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
+        label.pack(side=tk.LEFT)
+        entry.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
+        entries[field] = entry
     
 def on_submit():
     global global_invoice_data
@@ -196,10 +194,12 @@ def on_submit():
     try:
         new_invoice_path, formatted_data_2 = create_excel_invoice(invoice_data)
         print(f"Invoice saved to: {new_invoice_path}")
+        messagebox.showinfo("Success", f"Invoice saved to: {new_invoice_path}")
         # Optionally, you can show a success message to the user here
     except Exception as e:
-        print(f"Error generating invoice: {e}")
-        # Optionally, handle or show the error to the user here
+        messagebox.showerror("Error", f"Error generating invoice: {e}")  # Show an error message box
+        print(f"Error generating invoice: {e}")  # Also print the error to the console for debugging
+            
     def copy_to_clipboard():
         app.clipboard_clear()  # Clear the clipboard
         app.clipboard_append(formatted_data_2)  # Append the formatted data to the clipboard
